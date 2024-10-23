@@ -2,7 +2,7 @@ import fs from 'fs';
 import multer from 'multer';
 import csvParser from 'csv-parser';
 import db from '../../../utils/db';
-import { contactSchema } from '../../../utils/validation'; // Ensure you import contactSchema
+import { contactSchema } from '../../../utils/validation';
 
 const upload = multer({ dest: 'uploads/' }); // Temporary storage
 
@@ -27,7 +27,6 @@ const uploadHandler = async (req, res) => {
             })
             .on('end', async () => {
                 for (const contact of results) {
-                    const { name, email, phone, address, timezone } = contact;
                     try {
                         await contactSchema.validateAsync(contact); // Validate each contact
                         contacts.push(contact);
@@ -51,7 +50,8 @@ const uploadHandler = async (req, res) => {
                 try {
                     await Promise.all(promises);
                     res.status(201).json({ message: 'Contacts uploaded successfully' });
-                } catch (dbError) {
+                } catch {
+                    // Handle the error without the dbError variable
                     return res.status(500).json({ error: 'Failed to save contacts to database' });
                 } finally {
                     // Cleanup: Delete the temporary file
